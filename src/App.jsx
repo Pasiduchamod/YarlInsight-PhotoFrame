@@ -7,12 +7,9 @@ import {
   UploadCloud, 
   Download, 
   Linkedin, 
-  Sparkles, 
   RefreshCw,
   Gift,
-  CheckCircle2,
-  ArrowRight,
-  ShieldCheck
+  ArrowRight
 } from 'lucide-react';
 
 export default function App() {
@@ -31,7 +28,7 @@ export default function App() {
     if (!dataUrl) return;
 
     const link = document.createElement('a');
-    link.download = 'YarlInsight-Swag-Frame.png';
+    link.download = 'YarlInsight-Frame.png';
     link.href = dataUrl;
     document.body.appendChild(link);
     link.click();
@@ -50,23 +47,6 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  // Preset Sample Avatar for instant 1-click test
-  const handleUseSamplePhoto = () => {
-    const sampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
-      <defs>
-        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#0b1424" />
-          <stop offset="100%" stop-color="#135398" />
-        </linearGradient>
-      </defs>
-      <rect width="600" height="600" fill="url(#g)"/>
-      <circle cx="300" cy="240" r="110" fill="#f3a41d"/>
-      <path d="M 120 540 Q 300 360 480 540 Z" fill="#f3a41d"/>
-    </svg>`;
-    const dataUrl = `data:image/svg+xml;base64,${btoa(sampleSvg)}`;
-    setImageSrc(dataUrl);
-  };
-
   return (
     <div className="min-h-screen bg-[#060b13] text-slate-100 flex flex-col relative overflow-x-hidden">
       {/* Background Glow Orbs */}
@@ -78,11 +58,6 @@ export default function App() {
 
       {/* Hero Banner */}
       <section className="relative pt-10 pb-6 text-center px-4 max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold mb-5 shadow-sm">
-          <Gift className="w-3.5 h-3.5" />
-          <span>Swag Contest Photo Generator</span>
-        </div>
-
         <div className="flex justify-center mb-5">
           <img src="/sample_logo.png" alt="YarlInsight" className="h-11 sm:h-14 w-auto object-contain drop-shadow-lg" />
         </div>
@@ -91,7 +66,7 @@ export default function App() {
           Get Your Official <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-blue-400">YarlInsight Frame</span>
         </h2>
         <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Upload your photo, align it inside our official event frame, and share on LinkedIn to enter the Swag Giveaway!
+          Upload your photo, align it inside our official event frame, and share on LinkedIn!
         </p>
       </section>
 
@@ -122,7 +97,7 @@ export default function App() {
 
                   <button
                     onClick={() => setIsShareModalOpen(true)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-5 bg-gradient-to-r from-blue-700 via-blue-600 to-amber-500 hover:from-blue-600 hover:to-amber-400 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-600/25 active:scale-[0.98] group"
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-5 bg-[#0a66c2] hover:bg-[#0854a0] text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#0a66c2]/25 active:scale-[0.98] group"
                   >
                     <Linkedin className="w-4 h-4" />
                     <span>Share on LinkedIn</span>
@@ -172,26 +147,13 @@ export default function App() {
                   <p className="text-xs text-slate-400 mt-1">Supports PNG, JPG, WebP photos</p>
                 </div>
               </label>
-
-              {/* Quick Sample Photo Test */}
-              {!imageSrc && (
-                <div className="pt-1 text-center">
-                  <button
-                    onClick={handleUseSamplePhoto}
-                    className="text-xs text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center gap-1.5 py-1 px-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 rounded-full transition-all"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Test with a demo photo
-                  </button>
-                </div>
-              )}
             </div>
 
-            {/* Step 2: How to Win Swag Card */}
+            {/* Step 2: Instructions Card */}
             <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-slate-800/80 space-y-4">
               <h3 className="text-base font-bold text-white flex items-center gap-2 font-outfit">
                 <Gift className="w-5 h-5 text-amber-400" />
-                Step 2: How to Win Swag
+                Step 2: Fit & Share
               </h3>
 
               <div className="space-y-3.5">
@@ -205,14 +167,14 @@ export default function App() {
                 <div className="flex items-start gap-3 p-3 bg-slate-900/50 border border-slate-800/60 rounded-xl">
                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5 border border-amber-500/30">2</span>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Click <strong className="text-white">Download Photo</strong> and copy our pre-written giveaway caption.
+                    Click <strong className="text-white">Download Photo</strong> and copy our pre-written post caption.
                   </p>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-slate-900/50 border border-slate-800/60 rounded-xl">
                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5 border border-amber-500/30">3</span>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Post on LinkedIn using hashtags <strong className="text-amber-400">#IEEEUOJ #YarlInsight2026 #YarlInsight</strong> to enter the giveaway!
+                    Post on LinkedIn using hashtags <strong className="text-amber-400">#IEEEUOJ #YarlInsight2026 #YarlInsight</strong>!
                   </p>
                 </div>
               </div>

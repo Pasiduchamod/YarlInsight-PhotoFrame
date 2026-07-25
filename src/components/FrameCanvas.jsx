@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
-import { ZoomIn, ZoomOut, RotateCw, Move, RefreshCw } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCw, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Lock, Hand } from 'lucide-react';
 
 const CanvasEditor = forwardRef(({
   imageSrc,
@@ -18,6 +18,9 @@ const CanvasEditor = forwardRef(({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  // Move Mode toggle state (OFF by default so mobile page scrolling works 100% naturally)
+  const [moveModeActive, setMoveModeActive] = useState(false);
 
   // Loaded HTML Image object
   const [userImage, setUserImage] = useState(null);
@@ -41,6 +44,7 @@ const CanvasEditor = forwardRef(({
       setZoomMultiplier(1.0); // Reset to 100% fit
       setOffset({ x: 0, y: 0 });
       setRotation(0);
+      setMoveModeActive(false); // Default to locked page scroll mode
     };
     img.src = imageSrc;
   }, [imageSrc]);
@@ -106,9 +110,9 @@ const CanvasEditor = forwardRef(({
     }
   }));
 
-  // Pointer / Mouse events for drag-to-position
+  // Pointer / Mouse events for drag-to-position (Only active when moveModeActive is TRUE)
   const handlePointerDown = (e) => {
-    if (!userImage) return;
+    if (!userImage || !moveModeActive) return;
     setIsDragging(true);
     setDragStart({
       x: e.clientX - offset.x,
@@ -117,7 +121,7 @@ const CanvasEditor = forwardRef(({
   };
 
   const handlePointerMove = (e) => {
-    if (!isDragging) return;
+    if (!isDragging || !moveModeActive) return;
     setOffset({
       x: e.clientX - dragStart.x,
       y: e.clientY - dragStart.y
@@ -126,6 +130,15 @@ const CanvasEditor = forwardRef(({
 
   const handlePointerUp = () => {
     setIsDragging(false);
+  };
+
+  // Nudge Direction Helpers (1-tap adjustments without touch drag)
+  const handleNudge = (dx, dy) => {
+    if (!userImage) return;
+    setOffset(prev => ({
+      x: prev.x + dx,
+      y: prev.y + dy
+    }));
   };
 
   // Center fit helper
@@ -147,9 +160,14 @@ const CanvasEditor = forwardRef(({
 
   return (
     <div className="flex flex-col items-center w-full max-w-xl mx-auto">
-      {/* Canvas Container with Drag Handlers */}
+      
+      {/* Canvas Container with Conditional Touch Action */}
       <div 
-        className="relative w-full aspect-square bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 cursor-grab active:cursor-grabbing group touch-none select-none"
+        className={`relative w-full aspect-square bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 select-none ${
+          moveModeActive 
+            ? 'cursor-grab active:cursor-grabbing touch-none ring-2 ring-amber-500/50' 
+            : 'touch-pan-y'
+        }`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -162,27 +180,49 @@ const CanvasEditor = forwardRef(({
           className="w-full h-full object-contain"
         />
 
-        {/* Drag Hint Overlay */}
+        {/* Single Floating Toggle Button inside Canvas Top Right */}
         {userImage && (
-          <div className="absolute top-4 right-4 bg-slate-950/80 backdrop-blur-md text-slate-300 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-slate-700/80 pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity shadow-lg">
-            <Move className="w-3.5 h-3.5 text-amber-400" />
-            <span>Drag photo to position</span>
-          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMoveModeActive(prev => !prev);
+            }}
+            className={`absolute top-4 right-4 backdrop-blur-md text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border transition-all shadow-lg z-10 active:scale-95 ${
+              moveModeActive
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold ring-2 ring-amber-400/50'
+                : 'bg-slate-950/85 hover:bg-slate-900 text-amber-400 border-amber-500/40 font-semibold'
+            }`}
+          >
+            {moveModeActive ? (
+              <>
+                <Hand className="w-3.5 h-3.5" />
+                <span>Move Mode: ON</span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-3.5 h-3.5" />
+                <span>Tap to Move Photo</span>
+              </>
+            )}
+          </button>
         )}
       </div>
 
       {/* Interactive Controls Bar */}
       {userImage && (
-        <div className="w-full bg-slate-900/90 border border-slate-800 backdrop-blur-md rounded-xl p-4 mt-4 shadow-lg">
+        <div className="w-full bg-slate-900/90 border border-slate-800 backdrop-blur-md rounded-2xl p-4 mt-4 shadow-lg space-y-4">
+          
+          {/* Zoom Slider + Step Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             
-            {/* Zoom Slider with Clickable + and - Buttons */}
-            <div className="flex items-center gap-2.5 w-full sm:w-auto flex-1 max-w-xs">
+            {/* Zoom Slider */}
+            <div className="flex items-center gap-2.5 w-full sm:w-auto flex-1">
               <button
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomMultiplier <= 0.5}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700 shrink-0"
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700 shrink-0"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4 text-amber-400" />
@@ -202,7 +242,7 @@ const CanvasEditor = forwardRef(({
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomMultiplier >= 2.5}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700 shrink-0"
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700 shrink-0"
                 title="Zoom In"
               >
                 <ZoomIn className="w-4 h-4 text-amber-400" />
@@ -218,7 +258,7 @@ const CanvasEditor = forwardRef(({
               <button
                 type="button"
                 onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors border border-slate-700"
                 title="Rotate 90 degrees"
               >
                 <RotateCw className="w-3.5 h-3.5 text-amber-400" />
@@ -228,15 +268,54 @@ const CanvasEditor = forwardRef(({
               <button
                 type="button"
                 onClick={handleResetPosition}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors border border-slate-700"
                 title="Reset Position"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
                 <span>Reset</span>
               </button>
             </div>
-
           </div>
+
+          {/* Directional Arrow Nudge Buttons */}
+          <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Position Arrows:</span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleNudge(-15, 0)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 border border-slate-700/80 active:scale-95 transition-all"
+                title="Nudge Left"
+              >
+                <ArrowLeft className="w-4 h-4 text-amber-400" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNudge(0, -15)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 border border-slate-700/80 active:scale-95 transition-all"
+                title="Nudge Up"
+              >
+                <ArrowUp className="w-4 h-4 text-amber-400" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNudge(0, 15)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 border border-slate-700/80 active:scale-95 transition-all"
+                title="Nudge Down"
+              >
+                <ArrowDown className="w-4 h-4 text-amber-400" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNudge(15, 0)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 border border-slate-700/80 active:scale-95 transition-all"
+                title="Nudge Right"
+              >
+                <ArrowRight className="w-4 h-4 text-amber-400" />
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
     </div>

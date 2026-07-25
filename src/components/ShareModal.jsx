@@ -36,7 +36,7 @@ Proud to be part of Yarl Insight 3.0, where passionate learners come together to
 
         {/* Header */}
         <div className="flex items-center gap-3.5 mb-6">
-          <div className="p-3 bg-gradient-to-br from-blue-700 to-amber-500 rounded-2xl text-white shadow-lg shadow-blue-600/20">
+          <div className="p-3 bg-[#0a66c2] rounded-2xl text-white shadow-lg shadow-[#0a66c2]/20">
             <Linkedin className="w-6 h-6" />
           </div>
           <div>
@@ -101,10 +101,10 @@ Proud to be part of Yarl Insight 3.0, where passionate learners come together to
               </button>
             </div>
 
-            {/* Share to LinkedIn Trigger Button */}
+            {/* Solid Official LinkedIn Blue Button */}
             <button
               onClick={handleOpenLinkedIn}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-blue-700 via-blue-600 to-amber-500 hover:from-blue-600 hover:to-amber-400 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 group"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-[#0a66c2] hover:bg-[#0854a0] text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-[#0a66c2]/30 group"
             >
               <Linkedin className="w-4 h-4" />
               <span>Open LinkedIn Feed to Post</span>
