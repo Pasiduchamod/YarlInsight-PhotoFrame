@@ -2,13 +2,13 @@
 // Uses user-provided official YarlInsight logo (/sample_logo.png)
 // Brand Colors: Royal Blue (#135398), Amber Gold (#f3a41d), Dark Midnight Navy (#0b1424)
 
-let logoImage = null;
+let frameImage = null;
 if (typeof window !== 'undefined') {
   const img = new Image();
   img.crossOrigin = 'anonymous';
-  img.src = '/sample_logo.png';
+  img.src = '/frame.png';
   img.onload = () => {
-    logoImage = img;
+    frameImage = img;
   };
 }
 
@@ -17,6 +17,11 @@ export const OFFICIAL_FRAME = {
   name: 'Official YarlInsight Event Frame',
   subtitle: 'Exclusive Swag Contest Participant Overlay',
   drawOverlay: (ctx, width, height, customBadgeText = 'ATTENDING YARLINSIGHT 2026') => {
+    if (frameImage && frameImage.complete && frameImage.naturalWidth > 0) {
+      ctx.drawImage(frameImage, 0, 0, width, height);
+      return;
+    }
+
     const borderWidth = Math.max(18, width * 0.038);
 
     // 1. Dual Gradient Outer Border Frame (Royal Blue to Golden Yellow)
@@ -57,20 +62,6 @@ export const OFFICIAL_FRAME = {
     ctx.lineWidth = 2.5;
     ctx.stroke();
     ctx.restore();
-
-    // Render Official User Logo (/sample_logo.png) in Top Bar
-    if (logoImage && logoImage.complete && logoImage.naturalWidth > 0) {
-      const logoH = topBarH * 0.60;
-      const maxLogoW = topBarW * 0.85;
-      const aspect = logoImage.naturalWidth / logoImage.naturalHeight;
-      let logoW = logoH * aspect;
-      if (logoW > maxLogoW) {
-        logoW = maxLogoW;
-      }
-      const logoX = width / 2 - logoW / 2;
-      const logoY = topBarY + (topBarH - logoH) / 2;
-      ctx.drawImage(logoImage, logoX, logoY, logoW, logoH);
-    }
 
     // 4. Bottom Main Badge Container
     const bottomBoxH = Math.max(88, height * 0.155);

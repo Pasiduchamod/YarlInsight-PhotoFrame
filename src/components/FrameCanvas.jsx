@@ -9,6 +9,18 @@ const CanvasEditor = forwardRef(({
 }, ref) => {
   const canvasRef = useRef(null);
 
+  // Default Frame Image from public/frame.png
+  const [frameOverlayImg, setFrameOverlayImg] = useState(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      setFrameOverlayImg(img);
+    };
+    img.src = '/frame.png';
+  }, []);
+
   // Base cover-fit scale calculated when user image loads
   const [baseScale, setBaseScale] = useState(1);
   // Fixed multiplier: 0.5 (50%) to 2.5 (250%)
@@ -92,10 +104,12 @@ const CanvasEditor = forwardRef(({
     // Draw Frame Overlay
     if (customFrameImg) {
       ctx.drawImage(customFrameImg, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    } else if (frameOverlayImg) {
+      ctx.drawImage(frameOverlayImg, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
     } else if (selectedFrame && selectedFrame.drawOverlay) {
       selectedFrame.drawOverlay(ctx, CANVAS_SIZE, CANVAS_SIZE, customBadgeText);
     }
-  }, [userImage, currentScale, rotation, offset, selectedFrame, customFrameImg, customBadgeText]);
+  }, [userImage, currentScale, rotation, offset, selectedFrame, customFrameImg, frameOverlayImg, customBadgeText]);
 
   useEffect(() => {
     renderCanvas();
